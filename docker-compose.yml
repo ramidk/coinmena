@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  web: &django-base
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+    restart: always
+    command: gunicorn coinmena.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - 8010:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - redis
+    profiles: ["main"]
+
+  celery_workers: &celery-base
+    <<: *django-base
+    entrypoint: ./docker/celery/entrypoint.sh
+    command: celery -A coinmena.celery:app worker --loglevel=DEBUG
+    ports: []
+    depends_on:
+      - web
+    profiles: ["main"]
+
+  celery_beat:
+    <<: *celery-base
+    command: celery -A coinmena.celery:app beat --loglevel=DEBUG
+    profiles: ["main"]
+
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    profiles: ["tests", "main"]
+
+  redis:
+    image: redis:6.2.6
+    restart: always
+    profiles: ["main"]
+
+  flower:
+    image: mher/flower
+    ports:
+      - 5560:5555
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+    profiles: ["main"]
+
+  tests:
+    build:
+      context: .
+      dockerfile: ./docker/tests/Dockerfile
+    env_file:
+      - ./.env
+    command: pytest
+    restart: "no"
+    ports: []
+    depends_on: []
+    profiles: ["tests"]
+
+volumes:
+  postgres_data:

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="TerminalProjectOptionsProvider">
+    <envs>
+      <env key="PYTHONUNBUFFERED" value="1" />
+      <env key="DJANGO_SETTINGS_MODULE" value="coinmena.settings" />
+      <env key="SECRET_KEY" value="some_secret_key" />
+      <env key="DATABASE_USER" value="coinmena" />
+      <env key="DATABASE_PASSWORD" value="987987" />
+      <env key="DATABASE_HOST" value="192.168.99.113" />
+      <env key="DATABASE_PORT" value="5433" />
+      <env key="CELERY_BROKER_URL" value="redis://127.0.0.1:6379/1" />
+      <env key="ALPHAVANTAGE_API_KEY" value="some" />
+    </envs>
+  </component>
+</project>
